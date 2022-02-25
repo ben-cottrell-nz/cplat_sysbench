@@ -48,24 +48,31 @@ PCIDeviceTreeData::PCIDeviceTreeData(QObject* p)
 			  return false;
 			});
 	for (auto di = 0; di<devList.size();) {
-		pci_dev* dev = devList[di];
-		name = pci_lookup_name(m_pciacc, namebuf,
-				sizeof(namebuf), PCI_LOOKUP_DEVICE,
-				dev->vendor_id, dev->device_id);
 		auto busChildCount = std::count_if(devList.begin(),
 				devList.end(), [&](pci_dev* first) {
-				  return first->bus==dev->bus;
+				  return first->bus==devList[di]->bus;
 				});
+		QTreeWidgetItem* busRootItem;
 		if (busChildCount>0) {
-			auto* busRootItem = new QTreeWidgetItem(
-					{QString("%1").arg(dev->domain),
-					 QString("%1").arg(dev->bus),
-					 QString("%1").arg(dev->dev),
-					 QString("%1").arg(dev->func),
+			auto* curDev = devList[di+busChildCount-1];
+			name = pci_lookup_name(m_pciacc, namebuf,
+					sizeof(namebuf), PCI_LOOKUP_DEVICE,
+					curDev->vendor_id, curDev->device_id);
+			busRootItem = new QTreeWidgetItem(
+					{QString("%1").arg(curDev->domain),
+					 QString("%1").arg(curDev->bus),
+					 QString("%1").arg(curDev->dev),
+					 QString("%1").arg(curDev->func),
 					 QString("%1").arg(name)});
-			for (auto i = 0; i<busChildCount; i++) {
-				auto* curDev = devList[di+i];
-				busRootItem->insertChild(i, new
+			size_t i;
+			// add the children, except the last which is the
+			// root node
+			for (i = 0; i<busChildCount-1; i++) {
+				curDev = devList[di+i];
+				name = pci_lookup_name(m_pciacc, namebuf,
+						sizeof(namebuf), PCI_LOOKUP_DEVICE,
+						curDev->vendor_id, curDev->device_id);
+				busRootItem->insertChild(0, new
 				QTreeWidgetItem(
 						{QString("%1").arg(curDev->domain),
 						 QString("%1").arg(curDev->bus),
@@ -73,10 +80,22 @@ PCIDeviceTreeData::PCIDeviceTreeData(QObject* p)
 						 QString("%1").arg(curDev->func),
 						 QString("%1").arg(name)}));
 			}
+			//busRootItem = busRootItem->child(i);
 			di += busChildCount;
 		} else {
+			auto* curDev = devList[di];
+			name = pci_lookup_name(m_pciacc, namebuf,
+					sizeof(namebuf), PCI_LOOKUP_DEVICE,
+					curDev->vendor_id, curDev->device_id);
+			busRootItem = new QTreeWidgetItem(
+					{QString("%1").arg(dev->domain),
+					 QString("%1").arg(curDev->bus),
+					 QString("%1").arg(curDev->dev),
+					 QString("%1").arg(curDev->func),
+					 QString("%1").arg(name)});
 			di++;
 		}
+		m_List += busRootItem;
 	}
 }
 PCIDeviceTreeData::~PCIDeviceTreeData()
