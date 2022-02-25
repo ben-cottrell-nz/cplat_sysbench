@@ -22,14 +22,49 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Hardware</string>
+        <string>PCI Hardware</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QTreeWidget" name="HardwareTreeWidget">
+          <property name="uniformRowHeights">
+           <bool>true</bool>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+          <property name="animated">
+           <bool>true</bool>
+          </property>
+          <property name="columnCount">
+           <number>5</number>
+          </property>
+          <attribute name="headerShowSortIndicator" stdset="0">
+           <bool>true</bool>
+          </attribute>
           <column>
            <property name="text">
-            <string notr="true">1</string>
+            <string>Domain</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Bus</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Device</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Function</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Name</string>
            </property>
           </column>
          </widget>

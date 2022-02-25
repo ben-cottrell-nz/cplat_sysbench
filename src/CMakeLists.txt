@@ -17,7 +17,7 @@ find_package(Qt6 COMPONENTS
         Gui
         Widgets
         REQUIRED)
-add_executable(cplat_sysbench main.cpp ../include/mainwindow.h mainwindow.cpp)
+add_executable(cplat_sysbench main.cpp mainwindow.cpp pci_device_tree_data.cpp)
 add_library(libpciutils STATIC
         ${CMAKE_SOURCE_DIR}/../libpciutils/init.c
         ${CMAKE_SOURCE_DIR}/../libpciutils/access.c

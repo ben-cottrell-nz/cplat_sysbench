@@ -1,4 +1,3 @@
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -42,10 +41,12 @@ public:
 		gridLayout_2 = new QGridLayout(tab);
 		gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
 		HardwareTreeWidget = new QTreeWidget(tab);
-		QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
-		__qtreewidgetitem->setText(0, QString::fromUtf8("1"));
-		HardwareTreeWidget->setHeaderItem(__qtreewidgetitem);
 		HardwareTreeWidget->setObjectName(QString::fromUtf8("HardwareTreeWidget"));
+		HardwareTreeWidget->setUniformRowHeights(true);
+		HardwareTreeWidget->setSortingEnabled(true);
+		HardwareTreeWidget->setAnimated(true);
+		HardwareTreeWidget->setColumnCount(5);
+		HardwareTreeWidget->header()->setProperty("showSortIndicator", QVariant(true));
 
 		gridLayout_2->addWidget(HardwareTreeWidget, 0, 0, 1, 1);
 
@@ -72,7 +73,13 @@ public:
 	void retranslateUi(QMainWindow *MainWindow)
 	{
 		MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-		tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("MainWindow", "Hardware", nullptr));
+		QTreeWidgetItem *___qtreewidgetitem = HardwareTreeWidget->headerItem();
+		___qtreewidgetitem->setText(4, QCoreApplication::translate("MainWindow", "Name", nullptr));
+		___qtreewidgetitem->setText(3, QCoreApplication::translate("MainWindow", "Function", nullptr));
+		___qtreewidgetitem->setText(2, QCoreApplication::translate("MainWindow", "Device", nullptr));
+		___qtreewidgetitem->setText(1, QCoreApplication::translate("MainWindow", "Bus", nullptr));
+		___qtreewidgetitem->setText(0, QCoreApplication::translate("MainWindow", "Domain", nullptr));
+		tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("MainWindow", "PCI Hardware", nullptr));
 		tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("MainWindow", "System Info", nullptr));
 	} // retranslateUi
 
@@ -81,18 +88,17 @@ public:
 namespace Ui {
 class MainWindow: public Ui_MainWindow {};
 } // namespace Ui
+
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
+#include "pci_device_tree_data.h"
+
+class MainWindow : public QMainWindow {
 public:
 	MainWindow(QWidget* p = nullptr);
 private:
-	void PopulateHardwareTree();
+	PCIDeviceTreeData* m_PCIDeviceTreeData;
 	Ui::MainWindow* ui;
-	QList<QTreeWidgetItem*> m_HardwarePCIList;
-	struct pci_access* m_pciacc;
-	struct pci_dev* m_pcidev;
 };
 
 #endif // MAINWINDOW_H
