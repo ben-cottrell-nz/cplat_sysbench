@@ -47,45 +47,36 @@ PCIDeviceTreeData::PCIDeviceTreeData(QObject* p)
 				  return true;
 			  return false;
 			});
-	for (auto d = 0;
-		 d<devList.size();
-		 d++) {
-		pci_dev* dev = devList[d];
+	for (auto di = 0; di<devList.size();) {
+		pci_dev* dev = devList[di];
 		name = pci_lookup_name(m_pciacc, namebuf,
 				sizeof(namebuf), PCI_LOOKUP_DEVICE,
 				dev->vendor_id, dev->device_id);
-		auto busChildren = std::count_if(devList.begin(),
-				devList
-		.end(),	[&]
-		(pci_dev* first){
-			return first->bus == dev->bus;
-		});
-		if (busChildren > 0) {
+		auto busChildCount = std::count_if(devList.begin(),
+				devList.end(), [&](pci_dev* first) {
+				  return first->bus==dev->bus;
+				});
+		if (busChildCount>0) {
 			auto* busRootItem = new QTreeWidgetItem(
 					{QString("%1").arg(dev->domain),
 					 QString("%1").arg(dev->bus),
 					 QString("%1").arg(dev->dev),
 					 QString("%1").arg(dev->func),
 					 QString("%1").arg(name)});
-			busRootItem->setExpanded(true);
-
-			for (auto o = 0; d+o < devList
-			.size() && devList[d+o]->bus ==
-			dev->bus; o++) {
-				auto* childBusItem = new QTreeWidgetItem(
-						{QString("%1").arg(dev->domain),
-						 QString("%1").arg(dev->bus),
-						 QString("%1").arg(dev->dev),
-						 QString("%1").arg(dev->func),
-						 QString("%1").arg(name)});
-				childBusItem->setExpanded(true);
-				busRootItem->insertChild
-				(busRootItem->childCount(),
-				childBusItem);
+			for (auto i = 0; i<busChildCount; i++) {
+				auto* curDev = devList[di+i];
+				busRootItem->insertChild(i, new
+				QTreeWidgetItem(
+						{QString("%1").arg(curDev->domain),
+						 QString("%1").arg(curDev->bus),
+						 QString("%1").arg(curDev->dev),
+						 QString("%1").arg(curDev->func),
+						 QString("%1").arg(name)}));
 			}
-			m_List += busRootItem;
+			di += busChildCount;
+		} else {
+			di++;
 		}
-
 	}
 }
 PCIDeviceTreeData::~PCIDeviceTreeData()
